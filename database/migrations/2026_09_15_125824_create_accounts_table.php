@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('name');
             $table->enum('type', ['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE']);
-            $table->string('currency')->default('IDR');
+            $table->string('currency', 3)->default('IDR');
             $table->timestamps();
         });
     }

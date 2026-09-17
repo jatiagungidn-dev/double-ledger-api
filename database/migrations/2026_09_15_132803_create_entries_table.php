@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('entries', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('journal_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('account_id')->constrained('accounts')->cascadeOnDelete();
+            $table->foreignUuid('journal_id')->constrained('journals')->cascadeOnDelete();
             $table->decimal('amount', 19, 4);
             $table->enum('type', ['CREDIT', 'DEBIT']);
             $table->timestamps();

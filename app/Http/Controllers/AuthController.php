@@ -20,7 +20,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
-            'password' => Hash::make($fields['email']),
+            'password' => $fields['password'],
         ]);
 
         $token = $user->createToken('double_ledger_token')->plainTextToken;

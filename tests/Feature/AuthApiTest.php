@@ -20,8 +20,6 @@ class AuthApiTest extends TestCase
             'password' => 'example231',
         ]);
 
-        $response->dump();
-
         $response->assertStatus(201)->assertJsonStructure([
             'status',
             'message',
@@ -47,8 +45,6 @@ class AuthApiTest extends TestCase
             'password' => 'example321',
         ]);
 
-        $response->dump();
-
         $response->assertStatus(200)->assertJsonStructure([
             'status',
             'message',
@@ -70,8 +66,6 @@ class AuthApiTest extends TestCase
             'password' => 'example231',
         ]);
 
-        $response->dump();
-
         $response->assertStatus(422)->assertJson([
             'message' => 'Credentials do not match our records',
             'errors' => [
@@ -88,8 +82,6 @@ class AuthApiTest extends TestCase
             'email' => 'jangkung321@example.com',
             'password' => 'example231',
         ]);
-
-        $response->dump();
 
         $response->assertStatus(422)->assertJson([
             'message' => 'Credentials do not match our records',
@@ -114,11 +106,80 @@ class AuthApiTest extends TestCase
 
         $response = $this->postJson('/api/register', $userData);
 
-        $response->dump();
-
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
                 'email',
             ]);
+    }
+
+    public function test_registration_rejects_short_password(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Jangkung',
+            'email' => 'jangkung231@example.com',
+            'password' => '1234567',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_registration_requires_name(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'email' => 'jangkung231@example.com',
+            'password' => '12345678',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['name']);
+    }
+
+    public function test_registration_requires_email(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Jangkung',
+            'password' => '12345678',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_registration_requires_password(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Jangkung',
+            'email' => 'jangkung231@example.com',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_login_requires_email(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Jangkung',
+            'email' => 'jangkung231@example.com',
+            'password' => 'KungJang231',
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'password' => 'KungJang231',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_login_requires_password(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Jangkung',
+            'email' => 'jangkung231@example.com',
+            'password' => 'KungJang231',
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'jangkung231',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['password']);
     }
 }

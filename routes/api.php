@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\JournalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/accounts', [AccountController::class, 'store']);
     Route::get('/accounts/{account}', [AccountController::class, 'show']);
 });
+
+Route::get('/journals', [JournalController::class, 'index']);
+Route::get('/journals/{journal}', [JournalController::class, 'show']);
 
 Route::get('/health', [HealthController::class, 'show']);
 

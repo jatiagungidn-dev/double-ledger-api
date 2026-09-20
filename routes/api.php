@@ -12,11 +12,15 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/accounts', [AccountController::class, 'store']);
+    Route::get('/accounts', [AccountController::class, 'index']);
     Route::get('/accounts/{account}', [AccountController::class, 'show']);
 });
 
-Route::get('/journals', [JournalController::class, 'index']);
-Route::get('/journals/{journal}', [JournalController::class, 'show']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/journals', [JournalController::class, 'index']);
+    Route::get('/journals/{journal}', [JournalController::class, 'show']);
+    Route::post('/journals', [JournalController::class, 'store']);
+});
 
 Route::get('/health', [HealthController::class, 'show']);
 

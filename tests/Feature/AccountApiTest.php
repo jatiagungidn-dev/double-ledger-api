@@ -38,9 +38,18 @@ class AccountApiTest extends TestCase
 
         $reponse = $this->actingAs($user, 'sanctum')->getJson("/api/accounts/{$account->id}");
 
-        $reponse->dump();
-
         $reponse->assertStatus(200);
+    }
+
+    public function test_user_can_view_own_all_accounts(): void
+    {
+        $user = User::factory()->create();
+
+        Account::factory()->count(3)->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->getJson('/api/accounts');
+        $response->dump();
+        $response->assertStatus(200);
     }
 
     public function test_authenticated_user_can_create_an_account(): void
@@ -53,8 +62,6 @@ class AccountApiTest extends TestCase
             'type' => 'ASSET',
             'currency' => 'IDR',
         ]);
-
-        $response->dump();
 
         $response->assertStatus(201)->assertJsonStructure([
             'status', 'message', 'data',
@@ -75,8 +82,6 @@ class AccountApiTest extends TestCase
             'currency' => 'IDR',
         ]);
 
-        $response->dump();
-
         $response->assertStatus(401);
     }
 
@@ -89,8 +94,6 @@ class AccountApiTest extends TestCase
             'name' => 'BCA',
             'type' => 'ASSET',
         ]);
-
-        $response->dump();
 
         $response->assertStatus(201)->assertJsonStructure([
             'status', 'message', 'data',
@@ -113,8 +116,6 @@ class AccountApiTest extends TestCase
 
         $reponse = $this->getJson("/api/accounts/{$account->id}");
 
-        $reponse->dump();
-
         $reponse->assertStatus(401);
     }
 
@@ -126,8 +127,6 @@ class AccountApiTest extends TestCase
             'name' => 'BCA',
             'type' => 'ASSET',
         ]);
-
-        $response->dump();
 
         $response->assertStatus(422)->assertJsonValidationErrors(['code']);
     }
@@ -141,8 +140,6 @@ class AccountApiTest extends TestCase
             'type' => 'ASSET',
         ]);
 
-        $response->dump();
-
         $response->assertStatus(422)->assertJsonValidationErrors(['name']);
     }
 
@@ -154,8 +151,6 @@ class AccountApiTest extends TestCase
             'code' => '001',
             'name' => 'BCA',
         ]);
-
-        $response->dump();
 
         $response->assertStatus(422)->assertJsonValidationErrors(['type']);
     }

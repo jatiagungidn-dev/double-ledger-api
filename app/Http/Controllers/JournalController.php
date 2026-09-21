@@ -27,20 +27,24 @@ class JournalController extends Controller
     public function store(StoreJournalRequest $request)
     {
         $data = $request->validated();
-        $data['idempotency_key'] = $data['idempotency_key'] ?? null;
-
-        $journal = $request->user()->journals()->create($data);
 
         if ($request->filled('idempotency_key')) {
-            $existingJournal = $request->user()->journals()->where('idempotency_key', $request->idempotency_key)->first();
+            $existingJournal = $request->user()->journals()->where('idempotency_key', $data['idempotency_key'])->first();
 
             if ($existingJournal) {
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Journal created successfully',
-                    'data' => new JournalResource($journal),
-                ], 201);
+                    'message' => 'Journal already exists',
+                    'data' => new JournalResource($existingJournal),
+                ], 200);
             }
         }
+        $journal = $request->user()->journals()->create($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Journal created successfully',
+            'data' => new JournalResource($journal),
+        ], 201);
     }
 }

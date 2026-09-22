@@ -13,12 +13,12 @@ class Entry extends Model
 
     protected $fillable = ['account_id', 'journal_id', 'amount', 'type'];
 
-    public function accounts(): BelongsTo
+    public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
     }
 
-    public function journals(): BelongsTo
+    public function journal(): BelongsTo
     {
         return $this->belongsTo(Journal::class);
     }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EntryController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\JournalController;
 use Illuminate\Http\Request;
@@ -20,6 +21,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/journals', [JournalController::class, 'index']);
     Route::get('/journals/{journal}', [JournalController::class, 'show']);
     Route::post('/journals', [JournalController::class, 'store']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/journals/{journal}/entries', [EntryController::class, 'index']);
+    Route::get('/entries/{entry}', [EntryController::class, 'show']);
+    Route::post('/journals/{journal}/entries', [EntryController::class, 'store']);
 });
 
 Route::get('/health', [HealthController::class, 'show']);

@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/journals/{journal}/entries', [EntryController::class, 'index']);
     Route::get('/entries/{entry}', [EntryController::class, 'show']);
     Route::post('/journals/{journal}/entries', [EntryController::class, 'store']);
+    Route::delete('/entries/{entry}', [EntryController::class, 'destroy']);
 });
 
 Route::get('/health', [HealthController::class, 'show']);

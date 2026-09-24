@@ -30,4 +30,19 @@ class Journal extends Model
     {
         return $this->hasMany(Entry::class);
     }
+
+    public function getTotalDebitAttribute(): float
+    {
+        return (float) $this->entries()->where('type', 'DEBIT')->sum('amount');
+    }
+
+    public function getTotalCreditAttribute(): float
+    {
+        return (float) $this->entries()->where('type', 'CREDIT')->sum('amount');
+    }
+
+    public function isBalanced(): bool
+    {
+        return abs($this->total_debit - $this->total_credit) < 0.0001;
+    }
 }

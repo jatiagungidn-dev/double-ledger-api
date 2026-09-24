@@ -6,7 +6,9 @@ use App\Http\Requests\StoreEntryRequest;
 use App\Http\Resources\EntryResource;
 use App\Models\Entry;
 use App\Models\Journal;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class EntryController extends Controller
 {
@@ -14,30 +16,42 @@ class EntryController extends Controller
     {
         $this->authorize('view', $journal);
 
-        return EntryResource::collection($journal->entries()->latest()->paginate(10));
+        $entries = $journal->entries()->with('account')->latest()->get();
+
+        return EntryResource::collection($entries);
     }
 
     public function show(Entry $entry): EntryResource
     {
-        $this->authorize('view', $entry);
+        $this->authorize('view', $entry->journal);
 
-        return new EntryResource($entry);
+        return new EntryResource($entry->load('account'));
     }
 
-    public function store(StoreEntryRequest $request, Journal $journal): EntryResource
+    public function store(StoreEntryRequest $request, Journal $journal): JsonResponse
     {
-        $this->authorize('view', $journal);
+        $validated = $request->validated();
+        $journal = Journal::findOrFail($validated['journal_id']);
 
-        $data = $request->validated();
+        $this->authorize('update', $journal);
 
-        $account = $request->user()->accounts()->findOrFail($data['account_id']);
+        $entry = DB::transaction(function () use ($validated) {
+            return Entry::create($validated);
+        });
 
-        $entry = $journal->entries()->create([
-            'account_id' => $account->id,
-            'amount' => $data['amount'],
-            'type' => $data['type'],
-        ]);
+        return (new EntryResource($entry->load('account')))->response()->setStatusCode(201);
+    }
 
-        return new EntryResource($entry);
+    public function destroy(Entry $entry): JsonResponse
+    {
+        $this->authorize('update', $entry->journal);
+
+        DB::transaction(function () use ($entry) {
+            $entry->delete();
+        });
+
+        return response()->json([
+            'message' => 'Entry deleted successfully',
+        ], 200);
     }
 }
